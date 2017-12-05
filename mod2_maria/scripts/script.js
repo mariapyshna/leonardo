@@ -1,46 +1,97 @@
-var rawData
+// var rawData
 
 
-$.getJSON("data/senate.json", function(data) {
-    rawData = data;
+// $.getJSON("data/senate.json", function(data) {
+//     rawData = data;
 
-    console.log(data);
-    buildTable()
-})
-
-
-function buildTable() {
-
-    console.log("Bilding Table")
-    var table = $("#politicians")
-    $.each(rawData.results[0].members, function(index, member) {
-
-        console.log(member)
-        var tr = $("<tr>")
-
-        var fullName = [member.first_name, member.middle_name, member.last_name].filter(function(v) { return v !== null }).join(" ")
-
-        var link = $("<a>").text(fullName).attr("href", member.url)
-        $("<td>").append(link).appendTo(tr)
-
-        $("<td>").text(member.party).appendTo(tr)
-
-        $("<td>").text(member.state).appendTo(tr)
-
-        $("<td>").text(member.seniority).appendTo(tr)
-
-        $("<td>").text(member.votes_with_party_pct).appendTo(tr)
+//     console.log(data);
+//     buildTable()
+// })
 
 
+// function buildTable() {
 
-        table.append(tr)
+//     console.log("Bilding Table")
+//     var table = $("#politicians")
+//     $.each(rawData.results[0].members, function(index, member) {
 
-    })
+//         console.log(member)
+//         var tr = $("<tr>")
+
+//         var fullName = [member.first_name, member.middle_name, member.last_name].filter(function(v) { return v !== null }).join(" ")
+
+//         var link = $("<a>").text(fullName).attr("href", member.url)
+//         $("<td>").append(link).appendTo(tr)
+
+//         $("<td>").text(member.party).appendTo(tr)
+
+//         $("<td>").text(member.state).appendTo(tr)
+
+//         $("<td>").text(member.seniority).appendTo(tr)
+
+//         $("<td>").text(member.votes_with_party_pct).appendTo(tr)
+
+
+
+//         table.append(tr)
+
+//     })
+// }
+
+
+function DataHandler() {
+
+    this.jsonURL = "";
+    this.chamber = ""; // sentate or house
+    this.rawData = ""; // stores data from the server
+    this.members = [];
+
+    this.init = function() {
+        this.chamber = $("body").data("congress"); // senate or house?
+        this.jsonURL = "data/" + this.chamber + ".json";
+    }
+
+    this.loadJsonFile = function() {
+        var that = this;
+        $.getJSON(this.jsonURL, function(response) {
+            that.rawData = response;
+            that.members = that.rawData.results[0].members;
+            that.buildTable();
+        })
+    }
+
+    this.buildTable = function() {
+
+        var table = $("#politiciansTable tbody");
+
+        var tableRows = [];
+        $.each(this.members, function(i, member) {
+
+        	// console.log(member.party) // R D or I
+         //    console.log(tgifFilter[member.party])
+        	// valid?
+        	if( tgifFilter.shouldShowMember(member) ) {
+        	
+	            var tr = $("<tr>");
+	            var fullname = [member.first_name, member.middle_name, member.last_name].join(" ").replace("  ", " ")
+	            tr.append($("<td>").text(fullname));
+	            tr.append($("<td>").text(member.party));
+	            tr.append($("<td>").text(member.state));
+	            tr.append($("<td>").text(member.seniority));
+	            tr.append($("<td>").text(member.votes_with_party_pct + "%"));
+	            tableRows.push(tr);
+            } 
+        })
+        table.append(tableRows);
+    }
+
+    this.updateTable = function(){
+
+    	$("#politiciansTable tbody").html("");
+    	this.buildTable();
+    }
+
 }
-
-
-
-
 
 var dataHandler = new DataHandler();
 dataHandler.init();
@@ -57,38 +108,32 @@ $(document).on("ready", function() {
 // 	console.log("document clicked...")
 // } )
 
-$("#myTextInput").on("change", function() {
-    console.log("change...");
-    $("#textValue").text($(this).val())
-})
+// $("#myTextInput").on("change", function() {
+//     console.log("change...");
+//     $("#textValue").text($(this).val())
+// })
 
-$("#myTextInput").on("focus", function() {
-    console.log("focus...");
-    $(this).css("background", "red");
-})
+// $("#myTextInput").on("focus", function() {
+//     console.log("focus...");
+//     $(this).css("background", "red");
+// })
 
-$("#myTextInput").on("blur", function() {
-    console.log("blur...");
-    $(this).css("background", "white");
-})
+// $("#myTextInput").on("blur", function() {
+//     console.log("blur...");
+//     $(this).css("background", "white");
+// })
 
-$("#myTextInput").on("blur", function() {
-    console.log("blur...");
-    $(this).css("background", "white");
-})
+// $("#myTextInput").on("keydown", function() {
+//     console.log("keydown...");
 
-
-$("#myTextInput").on("keydown", function() {
-    console.log("keydown...");
-
-})
-$("#myTextInput").on("keyup", function() {
-    console.log("keyup...");
-    $("#textValue").text($(this).val())
-})
-$("#myTextInput").on("keypress", function() {
-    console.log("keypress...");
-})
+// })
+// $("#myTextInput").on("keyup", function() {
+//     console.log("keyup...");
+//     $("#textValue").text($(this).val())
+// })
+// $("#myTextInput").on("keypress", function() {
+//     console.log("keypress...");
+// })
 
 
 $("#filter input[type=checkbox]").on("change",function(){
@@ -106,15 +151,33 @@ $("#filter input[type=checkbox]").on("change",function(){
 
 function Filter (){
 
-	this.D = true;
-	this.R = true;
-	this.I = true;
+	this.partyFilter = {
+        "D" : true,
+        "R" : true,
+        "I" : true
+    }
 
 	this.activeState = "";
 
 	this.updateParty = function(party, checked) {
-		console.log("should update parties now...", party, checked)
 
+        console.log("=====")
+		console.log("should update parties now...")
+        console.log("party: ", party)
+        console.log("checked: ", checked)
+        console.log("current value: ",this[party])
+
+        this.partyFilter[party] = checked;
+
+        // if( party == "D") {
+        //     this.D = checked
+        // } else if (party == "R") {
+        //     this.R = checked
+        // } else if (party == "I") {
+        //     this.I = checked
+        // }
+
+        // this[ // this.D or this.R or this.I
 
 		// if(party == "D"){
 		// 	if(checked){
@@ -125,15 +188,35 @@ function Filter (){
 		// }
 
 		// ..better
-		this[party] = checked;
 
 
+        console.log("new value: ",this[party])
 
 		dataHandler.updateTable();
 
 	}
 
+
+    this.shouldShowMember = function(member){
+
+        console.log("checking if we should show", member.first_name, member.last_name, member.party)
+
+        // console.log(this[member.party])
+
+
+        return this.partyFilter[member.party];
+    }
 }
+
+
+
 var tgifFilter = new Filter();
 
+tgifFilter.updateParty("CDU",false)
+
+
 console.log(tgifFilter);
+
+
+
+

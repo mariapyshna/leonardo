@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" href="/styles/style.css">
 </head>
 
-<body>
+<body data-congress="senate">
     <nav>
         <div class="container">
             <div class="row">
@@ -14,7 +14,7 @@
                     <a href="index.html"><img src="/img/TGIF-Logo-green.jpg" alt="TGIF Logo" width="150"></a>
                 </div>
                 <div class="col-md-6 text-right">
-                    <a href="mailto:info@tgif.net" class="btn btn-default">info@tgif.net</a>
+                    <a href="mailto:info@tgif.net" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> info@tgif.net</a>
                 </div>
             </div>
         </div>
@@ -33,7 +33,7 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
                         <li><a href="index.html">Home</a></li>
-                        <li class="dropdown">
+                        <li class=" active dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Congress 113 <span class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 <li><a href="house.html">House</a></li>
@@ -60,21 +60,37 @@
             <div class="col-md-4">
             </div>
         </div>
+        <div>
+            <label for="filter">Filter by Party: </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" value=""> Republican</label>
+            <label class="checkbox-inline">
+                <input type="checkbox" value=""> Democrat</label>
+            <label class="checkbox-inline">
+                <input type="checkbox" value=""> Independent</label>
+        </div>
         <div class="row">
             <div class="col-md-12">
-                <table class="table table-striped table-hover" id="politicians">
+                <table class="table table-striped table-hover" id="politiciansTable">
                     <thead>
                         <tr>
                             <th>Name</th>
                             <th>Party</th>
                             <th>State</th>
                             <th>Seniority (years in office)</th>
-                            <th>Total votes, %</th>
+                            <th>Total votes</th>
                         </tr>
                     </thead>
                     <tbody>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <p><span class="glyphicon glyphicon-copyright-mark"></span> 2016 TGIF. All Rights Reserved</p>
             </div>
         </div>
     </div>
